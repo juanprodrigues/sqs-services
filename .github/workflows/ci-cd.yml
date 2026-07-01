@@ -132,11 +132,11 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./${{ matrix.service }}/Dockerfile
+          file: Dockerfile.microservice
           push: true
-          tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.service }}:latest
-            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository }}/${{ matrix.service }}:latest
+          build-args: |
+            SERVICE=${{ matrix.service }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
