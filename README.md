@@ -4,7 +4,7 @@ Este repositorio contiene una arquitectura de microservicios desarrollada con **
 
 ---
 
-## 🏗️ Arquitectura y Funcionamiento
+## Arquitectura y Funcionamiento
 
 El proyecto está dividido en **5 microservicios** independientes que se comunican de forma asíncrona a través de colas de mensajes SQS:
 
@@ -64,7 +64,7 @@ El proyecto está dividido en **5 microservicios** independientes que se comunic
 
 ---
 
-## 🛠️ Cómo Levantar el Ambiente
+## Cómo Levantar el Ambiente
 
 ### Prerrequisitos
 - **Java 17** o superior instalado.
@@ -142,7 +142,7 @@ En la raíz de cada servicio (`pedido-service`, `stock-service`, `pago-service`,
 
 ---
 
-## 🧪 Casos de Uso y Flujos de Prueba
+## Casos de Uso y Flujos de Prueba
 
 Puedes probar el flujo completo enviando peticiones HTTP tipo POST al puerto del `pedido-service` (`http://localhost:8080/pedidos`). A continuación se detallan los 3 escenarios principales de prueba:
 
@@ -239,7 +239,7 @@ curl -X POST http://localhost:8080/pedidos -H "Content-Type: application/json" -
 
 ---
 
-## 🔍 Comandos Útiles de Verificación
+## Comandos Útiles de Verificación
 
 Puedes verificar de forma directa el estado de la infraestructura mockeada de AWS usando la consola de comandos:
 
