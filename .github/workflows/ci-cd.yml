@@ -29,8 +29,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Run tests
-        run: mvn test
-
+        run: mvn test -Dspring.profiles.active=test
       - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
         with:
