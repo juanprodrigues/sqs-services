@@ -1,5 +1,7 @@
 package com.ecommerce.email.consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,8 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
 @Component
 public class PagoConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(PagoConsumer.class);
 
     private final SqsClient sqsClient;
     private final EmailService emailService;
@@ -45,6 +49,8 @@ public class PagoConsumer {
         response.messages()
                 .forEach(msg -> {
 
+                    log.info("Mensaje recibido de la cola pago-procesado: {}", msg.body());
+
                     try {
 
                         PagoProcesadoEvent event =
@@ -62,8 +68,7 @@ public class PagoConsumer {
                                         .build());
 
                     } catch (Exception e) {
-
-                        e.printStackTrace();
+                        log.error("Error al procesar mensaje de pago-procesado", e);
                     }
                 });
     }

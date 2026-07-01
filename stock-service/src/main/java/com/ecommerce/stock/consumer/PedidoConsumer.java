@@ -1,19 +1,23 @@
 package com.ecommerce.stock.consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.ecommerce.stock.event.PedidoCreadoEvent;
 import com.ecommerce.stock.service.StockService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class PedidoConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(PedidoConsumer.class);
 
     private final SqsClient sqsClient;
     private final StockService stockService;
@@ -45,6 +49,8 @@ public class PedidoConsumer {
         response.messages()
                 .forEach(msg -> {
 
+                    log.info("Mensaje recibido de la cola pedido-creado: {}", msg.body());
+
                     try {
 
                         PedidoCreadoEvent event =
@@ -62,7 +68,7 @@ public class PedidoConsumer {
                                         .build());
 
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Error al procesar mensaje de pedido-creado", e);
                     }
                 });
     }

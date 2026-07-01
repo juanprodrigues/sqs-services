@@ -6,11 +6,15 @@ import com.ecommerce.pedido.event.PedidoCreadoEvent;
 import com.ecommerce.pedido.messaging.PedidoProducer;
 import com.ecommerce.pedido.repository.PedidoRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PedidoService {
+
+    private static final Logger log = LoggerFactory.getLogger(PedidoService.class);
 
     private final PedidoRepository repository;
     private final PedidoProducer producer;
@@ -27,6 +31,8 @@ public class PedidoService {
     public Pedido crear(CrearPedidoRequest dto)
             throws Exception {
 
+        log.info("Creando pedido para cliente: {}, producto: {}, cantidad: {}", dto.cliente(), dto.producto(), dto.cantidad());
+
         Pedido pedido = new Pedido(
                 dto.cliente(),
                 dto.producto(),
@@ -36,6 +42,8 @@ public class PedidoService {
 
         Pedido guardado =
                 repository.save(pedido);
+
+        log.info("Pedido guardado con ID: {}", guardado.getId());
 
         producer.publicar(
                 new PedidoCreadoEvent(

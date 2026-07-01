@@ -1,5 +1,7 @@
 package com.ecommerce.pedido.messaging;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.pedido.event.PedidoCreadoEvent;
@@ -7,8 +9,11 @@ import com.ecommerce.pedido.event.PedidoCreadoEvent;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 public class PedidoProducer {
+
+    private static final Logger log = LoggerFactory.getLogger(PedidoProducer.class);
 
     private final SqsClient sqsClient;
     private final ObjectMapper mapper;
@@ -27,13 +32,20 @@ public class PedidoProducer {
     public void publicar(PedidoCreadoEvent event)
             throws Exception {
 
-        String json =
-                mapper.writeValueAsString(event);
+        log.info("Publicando evento PedidoCreadoEvent para pedido ID: {} a la cola: {}", event.pedidoId(), queueUrl);
 
-        sqsClient.sendMessage(
-                SendMessageRequest.builder()
-                        .queueUrl(queueUrl)
-                        .messageBody(json)
-                        .build());
+        try {
+            String json =
+                    mapper.writeValueAsString(event);
+
+            sqsClient.sendMessage(
+                    SendMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .messageBody(json)
+                            .build());
+        } catch (Exception e) {
+            log.error("Error al publicar PedidoCreadoEvent para pedido ID: {}", event.pedidoId(), e);
+            throw e;
+        }
     }
 }

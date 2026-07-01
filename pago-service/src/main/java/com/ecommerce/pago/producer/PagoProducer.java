@@ -1,5 +1,7 @@
 package com.ecommerce.pago.producer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.pago.event.PagoProcesadoEvent;
@@ -7,8 +9,11 @@ import com.ecommerce.pago.event.PagoProcesadoEvent;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 public class PagoProducer {
+
+    private static final Logger log = LoggerFactory.getLogger(PagoProducer.class);
 
     private final SqsClient sqsClient;
     private final ObjectMapper mapper;
@@ -28,11 +33,18 @@ public class PagoProducer {
             PagoProcesadoEvent event)
             throws Exception {
 
-        sqsClient.sendMessage(
-                SendMessageRequest.builder()
-                        .queueUrl(queueUrl)
-                        .messageBody(
-                                mapper.writeValueAsString(event))
-                        .build());
+        log.info("Publicando evento PagoProcesadoEvent para pedido ID: {} a la cola: {}. Aprobado: {}", event.pedidoId(), queueUrl, event.aprobado());
+
+        try {
+            sqsClient.sendMessage(
+                    SendMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .messageBody(
+                                    mapper.writeValueAsString(event))
+                            .build());
+        } catch (Exception e) {
+            log.error("Error al publicar PagoProcesadoEvent para pedido ID: {}", event.pedidoId(), e);
+            throw e;
+        }
     }
 }

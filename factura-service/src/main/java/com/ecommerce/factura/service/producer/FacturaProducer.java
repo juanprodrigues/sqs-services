@@ -1,5 +1,7 @@
 package com.ecommerce.factura.service.producer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.factura.event.FacturaGeneradaEvent;
@@ -10,6 +12,8 @@ import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
 @Service
 public class FacturaProducer {
+
+    private static final Logger log = LoggerFactory.getLogger(FacturaProducer.class);
 
     private final SqsClient sqsClient;
     private final ObjectMapper mapper;
@@ -29,11 +33,18 @@ public class FacturaProducer {
             FacturaGeneradaEvent event)
             throws Exception {
 
-        sqsClient.sendMessage(
-                SendMessageRequest.builder()
-                        .queueUrl(queueUrl)
-                        .messageBody(
-                                mapper.writeValueAsString(event))
-                        .build());
+        log.info("Publicando evento FacturaGeneradaEvent para pedido ID: {} a la cola: {}", event.pedidoId(), queueUrl);
+
+        try {
+            sqsClient.sendMessage(
+                    SendMessageRequest.builder()
+                            .queueUrl(queueUrl)
+                            .messageBody(
+                                    mapper.writeValueAsString(event))
+                            .build());
+        } catch (Exception e) {
+            log.error("Error al publicar FacturaGeneradaEvent para pedido ID: {}", event.pedidoId(), e);
+            throw e;
+        }
     }
 }
