@@ -3,7 +3,11 @@ name: Production CI/CD Microservices
 on:
   push:
     branches: ["main"]
-
+    
+permissions:
+  contents: read
+  packages: write
+  
 env:
   JAVA_VERSION: "17"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2"
