@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 
 import com.ecommerce.stock.event.PedidoCreadoEvent;
 import com.ecommerce.stock.service.StockService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
-import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class PedidoConsumer {

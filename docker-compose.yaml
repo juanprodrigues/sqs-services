@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: flaci
+    ports:
+      - "4566:4566"
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+    volumes:
+      - ./docker/localstack:/etc/localstack/init/ready.d
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      default:
+        aliases:
+          - floci
+
+  pedido-service:
+    build:
+      context: ./pedido-service
+      dockerfile: Dockerfile
+    container_name: pedido-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/pedido_service
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - AWS_ENDPOINT=http://floci:4566
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
+  stock-service:
+    build:
+      context: ./stock-service
+      dockerfile: Dockerfile
+    container_name: stock-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/stock_service
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - AWS_ENDPOINT=http://floci:4566
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
+  pago-service:
+    build:
+      context: ./pago-service
+      dockerfile: Dockerfile
+    container_name: pago-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/pago_service
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - AWS_ENDPOINT=http://floci:4566
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
+  email-service:
+    build:
+      context: ./email-service
+      dockerfile: Dockerfile
+    container_name: email-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/email_service
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - AWS_ENDPOINT=http://floci:4566
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
+  factura-service:
+    build:
+      context: ./factura-service
+      dockerfile: Dockerfile
+    container_name: factura-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/factura_service
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - AWS_ENDPOINT=http://floci:4566
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy

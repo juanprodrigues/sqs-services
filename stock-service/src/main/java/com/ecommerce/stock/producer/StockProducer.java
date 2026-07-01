@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.stock.event.StockValidadoEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class StockProducer {
