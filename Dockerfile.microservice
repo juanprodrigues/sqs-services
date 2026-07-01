@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1.7
+
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+
+ARG MODULE_NAME
+
+WORKDIR /app
+
+COPY . .
+
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn clean package \
+    -pl ${MODULE_NAME} \
+    -am \
+    -DskipTests
+
+FROM eclipse-temurin:17-jre-jammy
+
+ARG MODULE_NAME
+
+WORKDIR /app
+
+# 👇 ESTE ES EL FIX
+COPY --from=build /app/${MODULE_NAME}/target/*.jar app.jar
+
+ENTRYPOINT ["java","-jar","app.jar"]
