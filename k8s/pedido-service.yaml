@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pedido-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pedido-service
+  template:
+    metadata:
+      labels:
+        app: pedido-service
+    spec:
+      containers:
+      - name: pedido-service
+        image: ghcr.io/juanprodrigues/pedido-service:latest
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pedido-service
+spec:
+  selector:
+    app: pedido-service
+  ports:
+  - port: 8080
+    targetPort: 8080
