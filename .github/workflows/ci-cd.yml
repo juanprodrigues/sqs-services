@@ -136,7 +136,7 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository }}/${{ matrix.service }}:latest
           build-args: |
-            SERVICE=${{ matrix.service }}
+            MODULE_NAME=${{ matrix.service }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
